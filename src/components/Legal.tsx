@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { BRAND } from "../config/brand";
 export function Legal({ page }: { page: "privacy" | "open-source" }) {
   const [licenses, setLicenses] = useState<string[]>([]);
   useEffect(() => {
@@ -37,6 +38,12 @@ export function Legal({ page }: { page: "privacy" | "open-source" }) {
             Session explicitly removes it.
           </p>
           <h2>Project information and Gemini</h2>
+          <p>
+            Text and formatting edits happen locally without Gemini requests.
+            External statistical prompts may use Google's Search grounding to
+            find dated sources; relevant public queries are processed by Google.
+            Source evidence stays in this browser session with the diagram.
+          </p>
           <p>
             Project descriptions, selected repository files, blueprints,
             diagrams and refinement instructions are sent directly to Google
@@ -82,17 +89,17 @@ export function Legal({ page }: { page: "privacy" | "open-source" }) {
             Diagram Design project, used under the MIT License.
           </p>
           <p>
-            <a
-              href="https://github.com/cathrynlavery/diagram-design"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Diagram Design by Cathryn Lavery ↗
+            <a href={BRAND.repository} target="_blank" rel="noreferrer">
+              Drawgon on GitHub ↗
             </a>
           </p>
           <p>
-            Imported version 2.6, commit{" "}
-            <code>2724fd2efd8c6737f6fa704fbf5da52d67375497</code>. The
+            Built on{" "}
+            <a href="https://github.com/cathrynlavery/diagram-design">
+              Diagram Design by Cathryn Lavery
+            </a>
+            , under the MIT license reproduced below. Imported version 2.6,
+            commit <code>2724fd2efd8c6737f6fa704fbf5da52d67375497</code>. The
             application adapts the upstream design knowledge base: style rules,
             type references, primitives, examples and export guidance. Upstream
             authorship is retained.

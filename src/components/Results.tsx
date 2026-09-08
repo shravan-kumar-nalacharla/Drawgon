@@ -23,6 +23,9 @@ import {
 } from "../services/diagram/export";
 import { blueprintSchema } from "../services/gemini/schemas";
 import { ErrorBoundary, Field, Modal } from "./Primitives";
+import { DiagramEditor } from "./DiagramEditor";
+import { GenerationStatus } from "./GenerationStatus";
+import { FactualSources } from "./FactualSources";
 export type Job = {
   state: "waiting" | "running" | "done" | "error" | "cancelled";
   message: string;
@@ -75,14 +78,19 @@ export function Results({
     [error, setError] = useState(""),
     [editing, setEditing] = useState(false),
     [blueprintText, setBlueprintText] = useState("");
+  const [textEditor, setTextEditor] = useState<string>();
+  const [background, setBackground] = useState<"white" | "transparent">(
+    "white",
+  );
+  const editedDiagram = session.diagrams.find((d) => d.id === textEditor);
   async function download(diagram: GeneratedDiagram, f: Format) {
     setExporting(true);
     setError("");
     setMessage(`Preparing ${f.toUpperCase()} download…`);
     try {
       downloadBlob(
-        await diagramBlob(diagram, f, session.settings.scale),
-        `${safeFilename(session.project.title)}-${safeFilename(diagram.requestedType)}.${f}`,
+        await diagramBlob(diagram, f, session.settings.scale, background),
+        `${safeFilename(session.project.title)}-${safeFilename(diagram.requestedType)}${f === "presentation" ? "-presentation.svg" : `.${f}`}`,
       );
       setMessage("Download ready.");
     } catch (e) {
@@ -102,6 +110,7 @@ export function Results({
         session.settings,
         format,
         setMessage,
+        background,
       );
       downloadBlob(blob, `${safeFilename(session.project.title)}-diagrams.zip`);
       setMessage("ZIP download ready.");
@@ -142,6 +151,15 @@ export function Results({
           </button>
         </div>
       </div>
+      {busy && (
+        <GenerationStatus
+          jobs={jobs}
+          student={/student/i.test(session.settings.audience)}
+        />
+      )}
+      {session.blueprint?.factualData && (
+        <FactualSources data={session.blueprint.factualData} />
+      )}
       <div className="results-toolbar">
         <div role="tablist" aria-label="Workspace views">
           <button
@@ -174,6 +192,7 @@ export function Results({
               >
                 <option value="all">Everything</option>
                 <option value="svg">SVG only</option>
+                <option value="presentation">Presentation SVG only</option>
                 <option value="png">PNG only</option>
                 <option value="html">HTML only</option>
               </select>
@@ -286,6 +305,12 @@ export function Results({
                 <div className="result-actions">
                   <button
                     disabled={busy}
+                    onClick={() => setTextEditor(diagram.id)}
+                  >
+                    Edit text & style
+                  </button>
+                  <button
+                    disabled={busy}
                     onClick={() => onRegenerate(diagram.id)}
                   >
                     <RotateCw size={15} />
@@ -314,15 +339,34 @@ export function Results({
                       Download
                     </summary>
                     <div>
-                      {(["svg", "png", "html"] as const).map((f) => (
-                        <button
-                          key={f}
-                          disabled={exporting}
-                          onClick={() => download(diagram, f)}
+                      <label>
+                        Presentation background
+                        <select
+                          aria-label="Presentation background"
+                          value={background}
+                          onChange={(e) =>
+                            setBackground(
+                              e.target.value as "white" | "transparent",
+                            )
+                          }
                         >
-                          {f.toUpperCase()}
-                        </button>
-                      ))}
+                          <option value="white">White</option>
+                          <option value="transparent">Transparent</option>
+                        </select>
+                      </label>
+                      {(["svg", "presentation", "png", "html"] as const).map(
+                        (f) => (
+                          <button
+                            key={f}
+                            disabled={exporting}
+                            onClick={() => download(diagram, f)}
+                          >
+                            {f === "presentation"
+                              ? "Presentation SVG"
+                              : f.toUpperCase()}
+                          </button>
+                        ),
+                      )}
                     </div>
                   </details>
                 </div>
@@ -365,7 +409,9 @@ export function Results({
               </div>
               <p className="lede">{session.blueprint.summary}</p>
               {Object.entries(session.blueprint)
-                .filter(([key]) => !["title", "summary"].includes(key))
+                .filter(
+                  ([key]) => !["title", "summary", "factualData"].includes(key),
+                )
                 .map(([key, value]) => (
                   <details
                     key={key}
@@ -460,6 +506,34 @@ export function Results({
           </div>
         </Modal>
       )}
+      {editedDiagram && (
+        <Modal
+          title="Edit text & style"
+          wide
+          onClose={() => setTextEditor(undefined)}
+        >
+          <DiagramEditor
+            key={`${editedDiagram.id}-${editedDiagram.revision}`}
+            diagram={editedDiagram}
+            onChange={(changed) =>
+              update({
+                diagrams: session.diagrams.map((d) =>
+                  d.id === changed.id ? changed : d,
+                ),
+              })
+            }
+          />
+          <div className="button-row">
+            <button onClick={() => download(editedDiagram, "svg")}>
+              Download SVG
+            </button>
+            <button onClick={() => download(editedDiagram, "presentation")}>
+              Presentation SVG
+            </button>
+            <button onClick={() => setTextEditor(undefined)}>Done</button>
+          </div>
+        </Modal>
+      )}
       {refine && (
         <Modal title="Refine this diagram" onClose={() => setRefine(undefined)}>
           <p>Keep the same project understanding and refine only this view.</p>
@@ -515,7 +589,12 @@ export function Results({
                 const blueprint = blueprintSchema.parse(
                   JSON.parse(blueprintText),
                 );
-                update({ blueprint });
+                update({
+                  blueprint: {
+                    ...blueprint,
+                    factualData: session.blueprint?.factualData,
+                  },
+                });
                 setEditing(false);
                 setMessage(
                   "Project understanding updated. Regenerate diagrams to use it.",

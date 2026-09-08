@@ -369,7 +369,7 @@ export default function App({ initialPath }: { initialPath?: string } = {}) {
         >
           <span className="brand-icon">
             <img
-              src={`${import.meta.env.BASE_URL}drawgon-logo.png`}
+              src={BRAND.logo}
               alt=""
               width="36"
               height="36"
@@ -382,9 +382,9 @@ export default function App({ initialPath }: { initialPath?: string } = {}) {
           <a href="#examples" onClick={() => setPage("home")}>
             Examples
           </a>
-          <button onClick={() => navigate("open-source")}>
+          <a href={BRAND.repository} target="_blank" rel="noreferrer">
             Open source <ArrowUpRight size={13} />
-          </button>
+          </a>
           {connected ? (
             <>
               <button
@@ -498,7 +498,7 @@ export default function App({ initialPath }: { initialPath?: string } = {}) {
       <footer className="site-footer">
         <span className="footer-brand">
           <img
-            src={`${import.meta.env.BASE_URL}drawgon-logo.png`}
+            src={BRAND.logo}
             alt=""
             width="23"
             height="23"
@@ -511,8 +511,22 @@ export default function App({ initialPath }: { initialPath?: string } = {}) {
             <ShieldCheck size={13} />
             Privacy
           </button>
-          <button onClick={() => navigate("open-source")}>Open source</button>
+          <a href={BRAND.repository} target="_blank" rel="noreferrer">
+            Open source ↗
+          </a>
+          <button onClick={() => navigate("open-source")}>Licenses</button>
         </nav>
+        <small className="upstream-credit">
+          Built on{" "}
+          <a
+            href="https://github.com/cathrynlavery/diagram-design"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Diagram Design by Cathryn Lavery
+          </a>
+          .
+        </small>
       </footer>
       {reset && (
         <Modal

@@ -1,7 +1,15 @@
 import { z } from "zod";
+import type { FactualData } from "./freshness";
 const strings = z.array(z.string());
 const named = z.object({ name: z.string(), purpose: z.string() });
 export const blueprintSchema = z.object({
+  factualRequest: z
+    .object({
+      requiresExternalData: z.boolean(),
+      userProvidedValues: z.boolean(),
+      query: z.string(),
+    })
+    .optional(),
   title: z.string(),
   summary: z.string(),
   problem: z.string(),
@@ -50,7 +58,9 @@ export const blueprintSchema = z.object({
     z.object({ type: z.string(), reason: z.string() }),
   ),
 });
-export type Blueprint = z.infer<typeof blueprintSchema>;
+export type Blueprint = z.infer<typeof blueprintSchema> & {
+  factualData?: FactualData;
+};
 export const planSchema = z.object({
   title: z.string(),
   focus: z.string(),

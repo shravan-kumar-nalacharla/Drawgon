@@ -155,6 +155,7 @@ test("complete wizard, real SDK wire contract, repair, previews, downloads, refi
     expect(
       zip.file(`library-system-diagrams/${ext}/architecture.${ext}`),
     ).toBeTruthy();
+  expect(zip.file("library-system-diagrams/presentation/architecture.svg")).toBeTruthy();
   expect(
     await zip
       .file("library-system-diagrams/project-summary.json")!

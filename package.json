@@ -16,16 +16,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cathrynlavery/diagram-design.git"
+    "url": "git+https://github.com/shravan-kumar-nalacharla/Drawgon.git"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/cathrynlavery/diagram-design/issues"
+    "url": "https://github.com/shravan-kumar-nalacharla/Drawgon/issues"
   },
-  "homepage": "https://github.com/cathrynlavery/diagram-design#readme",
+  "homepage": "https://drawgon.in",
   "dependencies": {
     "@google/genai": "^2.21.0",
     "css-tree": "^3.2.1",

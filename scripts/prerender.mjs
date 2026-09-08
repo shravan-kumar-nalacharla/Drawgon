@@ -17,7 +17,7 @@ try {
   const { renderPage, routes, metadata, brand } = await vite.ssrLoadModule(
     "/src/seo/render.tsx",
   );
-  const { extractSvg } = await vite.ssrLoadModule(
+  const { extractRawSvg: extractSvg } = await vite.ssrLoadModule(
     "/src/services/diagram/safety.ts",
   );
   const { applyMonochrome } = await vite.ssrLoadModule(

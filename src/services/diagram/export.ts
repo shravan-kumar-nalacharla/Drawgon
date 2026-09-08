@@ -2,7 +2,8 @@ import type { Blueprint } from "../gemini/schemas";
 import type { GeneratedDiagram } from "../../types";
 import type { Settings } from "../../config/settings";
 import { extractSvg, sanitizeDiagram } from "./safety";
-export type Format = "html" | "svg" | "png";
+import type { ExportBackground } from "./presentation";
+export type Format = "html" | "svg" | "png" | "presentation";
 export function safeFilename(value: string) {
   return (
     value
@@ -71,17 +72,21 @@ export async function diagramBlob(
   diagram: GeneratedDiagram,
   format: Format,
   scale: number,
+  background: ExportBackground = "white",
 ) {
   if (format === "png") return exportPng(diagram.sanitizedHtml, scale);
   return new Blob(
     [
-      format === "svg"
-        ? extractSvg(diagram.sanitizedHtml)
+      format === "svg" || format === "presentation"
+        ? extractSvg(
+            diagram.sanitizedHtml,
+            format === "presentation" ? background : "diagram",
+          )
         : sanitizeDiagram(diagram.sanitizedHtml),
     ],
     {
       type:
-        format === "svg"
+        format === "svg" || format === "presentation"
           ? "image/svg+xml;charset=utf-8"
           : "text/html;charset=utf-8",
     },
@@ -93,6 +98,7 @@ export async function buildZip(
   settings: Settings,
   format: Format | "all",
   status: (s: string) => void,
+  background: ExportBackground = "white",
 ) {
   const { default: JSZip } = await import("jszip");
   const zip = new JSZip();
@@ -131,12 +137,14 @@ export async function buildZip(
   );
   for (const diagram of diagrams)
     for (const f of format === "all"
-      ? (["html", "svg", "png"] as const)
+      ? (["html", "svg", "presentation", "png"] as const)
       : [format]) {
       status(`Preparing ${diagram.title} (${f.toUpperCase()})…`);
       folder.file(
-        `${f}/${safeFilename(diagram.requestedType)}.${f}`,
-        await (await diagramBlob(diagram, f, settings.scale)).arrayBuffer(),
+        `${f}/${safeFilename(diagram.requestedType)}.${f === "presentation" ? "svg" : f}`,
+        await (
+          await diagramBlob(diagram, f, settings.scale, background)
+        ).arrayBuffer(),
       );
     }
   for (const name of ["LICENSE", "THIRD_PARTY_LICENSES.md"]) {

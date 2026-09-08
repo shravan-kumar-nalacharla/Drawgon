@@ -2,6 +2,7 @@ import DOMPurify from "dompurify";
 import * as css from "css-tree";
 import { canvases, type Settings } from "../../config/settings";
 import type { ValidationResult } from "../../types";
+import { normalizeSvg, type ExportBackground } from "./presentation";
 export const PREVIEW_CSP =
   "default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src 'none'; script-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'";
 const tags = [
@@ -100,6 +101,9 @@ export function sanitizeDiagram(html: string): string {
       "aria-labelledby",
       "aria-describedby",
       "xmlns",
+      "data-editor-only",
+      "data-text-id",
+      "data-role",
     ],
     FORBID_TAGS: [
       "script",
@@ -262,7 +266,10 @@ export function validateDiagram(
     warnings: [...new Set(warnings)],
   };
 }
-export function extractSvg(html: string) {
+export function extractSvg(html: string, background: ExportBackground = "diagram") {
+  return normalizeSvg(sanitizeDiagram(html), background);
+}
+export function extractRawSvg(html: string) {
   const doc = new DOMParser().parseFromString(
     sanitizeDiagram(html),
     "text/html",

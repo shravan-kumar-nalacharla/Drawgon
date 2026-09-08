@@ -1,5 +1,6 @@
 import type { Settings } from "./config/settings";
 import type { Blueprint } from "./services/gemini/schemas";
+import type { DiagramEditorState } from "./services/diagram/editor";
 export interface Project {
   title: string;
   abstract: string;
@@ -34,6 +35,7 @@ export interface GeneratedDiagram {
   assumptions: string[];
   fidelityNotes: string[];
   settings?: Settings;
+  editor?: DiagramEditorState;
 }
 export interface Session {
   project: Project;

@@ -145,16 +145,15 @@ export function Home({ start }: { start: () => void }) {
             <h2>Designed to explain.</h2>
           </div>
           <p>
-            Editorial clarity, powered by the
+            Editorial diagrams, built in the open.
             <br />
             <a
-              href="https://github.com/cathrynlavery/diagram-design"
+              href="https://github.com/shravan-kumar-nalacharla/Drawgon"
               target="_blank"
               rel="noreferrer"
             >
-              Diagram Design
-            </a>{" "}
-            design system.
+              Explore Drawgon on GitHub ↗
+            </a>
           </p>
         </div>
         <div className="examples-grid">

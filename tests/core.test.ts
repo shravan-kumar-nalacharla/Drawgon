@@ -15,7 +15,6 @@ import {
 import {
   sanitizeDiagram,
   validateDiagram,
-  extractSvg,
   sanitizeCss,
 } from "../src/services/diagram/safety";
 import { safeFilename, buildZip } from "../src/services/diagram/export";
@@ -173,8 +172,10 @@ describe("static diagram security", () => {
       false,
     );
   });
-  it("preserves accessible valid SVG with XML namespace, CSS and markers", () => {
-    const svg = extractSvg(validHtml);
+  it("preserves accessible valid SVG with XML namespace, CSS and markers", async () => {
+    // JSDOM has no SVG computed-style engine. Browser tests cover presentation normalization.
+    const { extractRawSvg } = await import("../src/services/diagram/safety");
+    const svg = extractRawSvg(validHtml);
     const parsed = new DOMParser().parseFromString(svg, "image/svg+xml");
     expect(parsed.querySelector("parsererror")).toBeNull();
     expect(parsed.documentElement.getAttribute("xmlns")).toBe(

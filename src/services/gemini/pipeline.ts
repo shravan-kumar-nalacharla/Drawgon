@@ -7,7 +7,13 @@ import {
   planSchema,
   type Blueprint,
 } from "./schemas";
-import { requestJson } from "./client";
+import { requestJson, requestText, UNTRUSTED_RULE } from "./client";
+import {
+  factualRequest,
+  freshnessPolicy,
+  type GroundingEvidence,
+  type FactualData,
+} from "./freshness";
 import {
   buildDiagramGenerationPrompt,
   loadDiagramDesignContext,
@@ -22,14 +28,70 @@ export async function analyzeProject(
   status: (s: string) => void,
 ): Promise<Blueprint> {
   status("Creating project blueprint…");
-  return requestJson(
+  const blueprint = await requestJson(
     blueprintSchema,
-    `Normalize supplied facts into one project blueprint. Distinguish explicit facts, repository evidence and assumptions. Never invent databases, infrastructure, authentication, APIs, methods, quantities or classes. Unknown values use empty strings/arrays; record meaningful uncertainty in assumptions. Make a component glossary. Source evidence must cite supplied field names or actual file paths. Recommend relevant types only from: ${diagramTypes.map((t) => t.id).join(", ")}.`,
+    `Normalize supplied facts into one project blueprint. Distinguish explicit facts, repository evidence and assumptions. Never invent databases, infrastructure, authentication, APIs, methods, quantities or classes. Unknown values use empty strings/arrays; record meaningful uncertainty in assumptions. Make a component glossary. Classify factualRequest: requiresExternalData only for real-world statistical/factual comparisons requiring outside sources, never conceptual/UML/architecture diagrams or supplied project details; userProvidedValues true only when all requested numeric data is supplied (a requested year or top-10 count is not supplied data). query is only the public statistical subject and requested year, without private project/repository data. Source evidence must cite supplied field names or actual file paths. Recommend relevant types only from: ${diagramTypes.map((t) => t.id).join(", ")}.`,
     `<UNTRUSTED_PROJECT_DATA>${JSON.stringify(project)}</UNTRUSTED_PROJECT_DATA>\n<UNTRUSTED_REPOSITORY_DATA>${JSON.stringify(repository ?? null)}</UNTRUSTED_REPOSITORY_DATA>`,
     settings.model,
     signal,
     status,
   );
+  const request = factualRequest(project);
+  if (blueprint.factualRequest) {
+    request.needed =
+      !request.technical &&
+      blueprint.factualRequest.requiresExternalData &&
+      !blueprint.factualRequest.userProvidedValues;
+    request.supplied = blueprint.factualRequest.userProvidedValues;
+  }
+  const policy = freshnessPolicy();
+  let factualData: FactualData | undefined;
+  if (request.supplied)
+    factualData = {
+      status: "user-provided",
+      checkedAt: new Date().toISOString(),
+      policy,
+      text: request.text,
+      citations: [],
+      suggestions: [],
+    };
+  if (request.needed) {
+    status("Checking current sources and reference years…");
+    let evidence: GroundingEvidence = { citations: [], suggestions: [] };
+    try {
+      const text = await requestText(
+        `${UNTRUSTED_RULE}\n${policy}\nResearch the requested external statistics using Google Search. Search only public statistical subjects, never repository content or private project details. Respond with a concise evidence table, not a diagram: entity, value, units, reference year, observation/estimate/projection, publisher and source URL. Cite every factual value using search evidence. If values are supplied in the request, preserve them.`,
+        blueprint.factualRequest?.query || request.text,
+        settings.model,
+        signal,
+        undefined,
+        status,
+        undefined,
+        (data) => {
+          evidence = data;
+        },
+      );
+      factualData = {
+        ...evidence,
+        status: evidence.citations.length ? "grounded" : "unverified",
+        checkedAt: new Date().toISOString(),
+        policy,
+        text: evidence.citations.length
+          ? text
+          : "Search returned no source citations. Do not supply quantitative values from memory. Ask the user for verified data.",
+      };
+    } catch {
+      signal.throwIfAborted();
+      factualData = {
+        ...evidence,
+        status: "unverified",
+        checkedAt: new Date().toISOString(),
+        policy,
+        text: "Current data could not be verified with Google Search for this key/model. Show data unavailable, preserve any user-provided values, and request a source. Never fabricate numeric data.",
+      };
+    }
+  }
+  return { ...blueprint, ...(factualData ? { factualData } : {}) };
 }
 export async function generateDiagram(
   blueprint: Blueprint,
@@ -78,10 +140,40 @@ export async function generateDiagram(
         : clean;
     const before = validateDiagram(result.html, settings);
     const after = validateDiagram(sanitizedHtml, settings);
+    const factualErrors: string[] = [];
+    if (blueprint.factualData) {
+      const svg = new DOMParser()
+        .parseFromString(sanitizedHtml, "text/html")
+        .querySelector("svg");
+      const visible = [...(svg?.querySelectorAll("text") || [])]
+        .map((el) => el.textContent || "")
+        .join(" ");
+      if (blueprint.factualData.status === "unverified") {
+        if (
+          !/unverified|unavailable|not verified|provide.{0,40}data/i.test(
+            visible,
+          )
+        )
+          factualErrors.push(
+            "Show a visible data unavailable notice in the SVG. Do not invent numerical bars.",
+          );
+      } else {
+        if (!/source|user.provided/i.test(visible))
+          factualErrors.push("Add a visible source line inside the SVG.");
+        if (
+          blueprint.factualData.status === "grounded" &&
+          !/\b(?:19|20)\d{2}\b/.test(visible)
+        )
+          factualErrors.push(
+            "Add the supported reference year visibly inside the SVG, and label estimates/projections correctly.",
+          );
+      }
+    }
     const errors = [
       ...new Set([
         ...before.errors,
         ...after.errors,
+        ...factualErrors,
         ...(result.canonicalType !== type.canonicalType
           ? ["Incorrect canonical diagram type."]
           : []),
@@ -105,7 +197,7 @@ export async function generateDiagram(
       };
     if (attempt === 2)
       throw new Error(
-        `This diagram did not pass validation after two repairs: ${errors.join(" ")} Regenerate to try again.`,
+        "We couldn't produce a safe, valid diagram after two repairs. Regenerate or simplify the prompt and check that the source data is available.",
       );
     status(`Repairing diagram (${attempt + 1} of 2)…`);
     result = await requestJson(

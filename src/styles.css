@@ -1799,6 +1799,7 @@ progress::-moz-progress-bar {
 }
 .brand-icon img,
 .footer-brand img {
+  mix-blend-mode: multiply;
   object-fit: contain;
   display: block;
 }
@@ -1952,4 +1953,186 @@ progress::-moz-progress-bar {
   .guide-example > .example-frame {
     height: 230px;
   }
+}
+/* Local text editing uses isolated SVG documents; the grid is CSS UI chrome only. */
+.text-toolbar,
+.text-properties {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  margin: 14px 0;
+}
+.text-toolbar label,
+.text-properties label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  min-width: 0;
+}
+.text-toolbar select {
+  max-width: 360px;
+}
+.text-properties select {
+  max-width: 220px;
+}
+.text-properties input[type="number"] {
+  width: 76px;
+}
+.text-properties input[type="color"] {
+  width: 44px;
+  height: 38px;
+  padding: 3px;
+}
+.text-properties .edit-copy {
+  flex-basis: 100%;
+}
+.edit-copy textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+.text-properties button[aria-pressed="true"] {
+  background: #222;
+  color: white;
+}
+.editor-canvas {
+  background-color: #eee;
+  background-image: radial-gradient(#ccc 1px, transparent 1px);
+  background-size: 20px 20px;
+  overflow: auto;
+  border: 1px solid #ddd;
+}
+.editor-canvas iframe {
+  width: 100%;
+  height: 600px;
+  border: 0;
+  display: block;
+}
+.editor-hint {
+  font-size: 14px;
+}
+.diagram-editor > small {
+  display: block;
+  margin: 12px 0;
+  color: #555;
+}
+.generation-status {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  border: 1px solid #ddd;
+  padding: 22px 24px 30px;
+  margin: 18px 0;
+  overflow: hidden;
+}
+.generation-status > div:not(.generation-track) {
+  flex: 1;
+  min-width: 0;
+}
+.generation-message {
+  display: block;
+  min-height: 26px;
+  animation: message-in 0.25s ease;
+}
+.generation-status small {
+  display: block;
+  color: #666;
+  font-size: 12px;
+  margin-top: 8px;
+}
+.elapsed {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+.generation-track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #ddd;
+}
+.generation-track span {
+  display: block;
+  width: 30%;
+  height: 100%;
+  background: #222;
+  animation: generation-travel 2.5s ease-in-out infinite;
+}
+@keyframes generation-travel {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(440%);
+  }
+}
+@keyframes message-in {
+  from {
+    opacity: 0.4;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (max-width: 600px) {
+  .text-toolbar select,
+  .text-properties select {
+    max-width: 100%;
+    width: 100%;
+  }
+  .text-toolbar label {
+    width: 100%;
+  }
+  .text-properties {
+    gap: 8px;
+  }
+  .editor-canvas iframe {
+    height: 360px;
+  }
+  .generation-status {
+    padding: 16px 12px 24px;
+    gap: 8px;
+  }
+  .generation-message {
+    min-height: 46px;
+  }
+  .text-properties .edit-copy {
+    position: static;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .generation-message,
+  .generation-track span {
+    animation: none;
+  }
+  .generation-track span {
+    width: 100%;
+    opacity: 0.35;
+  }
+}
+.site-footer {
+  flex-wrap: wrap;
+}
+.upstream-credit {
+  flex-basis: 100%;
+  font-size: 11px;
+  color: #555;
+}
+.factual-sources {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid #ddd;
+}
+.factual-sources pre {
+  max-height: 240px;
+  overflow: auto;
+  font-size: 13px;
+}
+.site-footer a {
+  color: inherit;
 }

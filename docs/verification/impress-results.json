@@ -1,0 +1,42 @@
+[
+  {
+    "fixture": "after",
+    "import_objects": 1,
+    "move_verified": true,
+    "after_break_objects": 8,
+    "tree": [
+      {
+        "type": "com.sun.star.drawing.PolyPolygonShape",
+        "text": ""
+      },
+      {
+        "type": "com.sun.star.drawing.LineShape",
+        "text": ""
+      },
+      {
+        "type": "com.sun.star.drawing.PolyPolygonShape",
+        "text": ""
+      },
+      {
+        "type": "com.sun.star.drawing.PolyPolygonShape",
+        "text": ""
+      },
+      {
+        "type": "com.sun.star.drawing.TextShape",
+        "text": "Population Comparison: India vs. United States"
+      },
+      {
+        "type": "com.sun.star.drawing.TextShape",
+        "text": "Country"
+      },
+      {
+        "type": "com.sun.star.drawing.TextShape",
+        "text": "Annotation"
+      },
+      {
+        "type": "com.sun.star.drawing.TextShape",
+        "text": "Source: user-provided test values, 2024 estimates"
+      }
+    ]
+  }
+]
