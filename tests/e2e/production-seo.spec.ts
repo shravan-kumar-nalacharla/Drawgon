@@ -1,9 +1,10 @@
 import {test,expect} from '@playwright/test';
 import {guides} from '../../src/config/seo';
+import {topics} from '../../src/visualizer/topics/registry';
 test('production routes are pre-rendered, canonical and usable without JavaScript',async({browser,request})=>{
   const context=await browser.newContext({javaScriptEnabled:false});const page=await context.newPage();
   for(const guide of guides){const response=await page.goto(`http://127.0.0.1:4173/${guide.slug}`);expect(response?.status()).toBe(200);await expect(page.getByRole('heading',{name:guide.title,exact:true})).toBeVisible();await expect(page.locator('link[rel=canonical]')).toHaveAttribute('href',`https://drawgon.in/${guide.slug}`);expect(await page.locator('script[type="application/ld+json"]').textContent()).toContain('Drawgon');await expect(page.locator('.guide-example img')).toBeVisible();}
-  const sitemap=await request.get('http://127.0.0.1:4173/sitemap.xml');expect(sitemap.status()).toBe(200);expect((await sitemap.text()).match(/<loc>/g)).toHaveLength(10);
+  const sitemap=await request.get('http://127.0.0.1:4173/sitemap.xml');expect(sitemap.status()).toBe(200);expect((await sitemap.text()).match(/<loc>/g)).toHaveLength(13+topics.length);
   const robots=await request.get('http://127.0.0.1:4173/robots.txt');expect(await robots.text()).toContain('Sitemap: https://drawgon.in/sitemap.xml');await context.close();
 });
 test('production application boots without console errors and guide CTA selects the type',async({page})=>{

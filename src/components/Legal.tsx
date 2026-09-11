@@ -25,8 +25,9 @@ export function Legal({ page }: { page: "privacy" | "open-source" }) {
           <h2>No database. No account.</h2>
           <p>
             We do not store your projects in an application database. No signup
-            is required, and this application contains no analytics, advertising
-            or tracking scripts.
+            is required. Project diagram and public information pages load Google
+            Analytics. Visualizer routes do not load analytics; their experiments
+            and local files are processed in your browser.
           </p>
           <h2>Your Gemini API key</h2>
           <p>

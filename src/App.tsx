@@ -17,6 +17,7 @@ import { projectHash } from "./services/projectHash";
 import { Home } from "./components/Home";
 import { Guide } from "./components/Guide";
 import { guides, pageMetadata } from "./config/seo";
+const Visualizer = lazy(() => import('./visualizer/Visualizer'));
 const Connect = lazy(() =>
   import("./components/Connect").then((m) => ({ default: m.Connect })),
 );
@@ -42,6 +43,9 @@ const fresh = (): Session => ({
   diagrams: [],
 });
 type Page =
+  | 'visualizer'
+  | `visualizer/${string}`
+  | 'diagrams'
   | "home"
   | "connect"
   | "wizard"
@@ -50,6 +54,8 @@ type Page =
   | "open-source"
   | (typeof guides)[number]["slug"];
 function currentPage(initialPath?: string): Page {
+  const pathname = (initialPath ?? (typeof location === 'undefined' ? '' : location.pathname)).replace(/^\/+|\/+$/g, '');
+  if (pathname === 'visualizer' || pathname.startsWith('visualizer/') || pathname === 'diagrams') return pathname as Page;
   const path = initialPath
     ? initialPath.replace(/^\/+|\/+$/g, "")
     : typeof location === "undefined"
@@ -104,7 +110,7 @@ export default function App({ initialPath }: { initialPath?: string } = {}) {
       "privacy",
       "open-source",
       ...guides.map((g) => g.slug),
-    ].includes(next);
+    ].includes(next) || next.startsWith('visualizer') || next === 'diagrams';
     history.replaceState(null, "", publicPage ? `/${next}` : "/");
   }
   useEffect(() => {
@@ -379,13 +385,15 @@ export default function App({ initialPath }: { initialPath?: string } = {}) {
           <span className="brand-beta">BETA</span>
         </button>
         <nav aria-label="Main navigation">
-          <a href="#examples" onClick={() => setPage("home")}>
+          <a href="/diagrams">Project Diagrams</a>
+          <a href="/visualizer">AI / ML Visualizer</a>
+          <a href="/#examples">
             Examples
           </a>
           <a href={BRAND.repository} target="_blank" rel="noreferrer">
             Open source <ArrowUpRight size={13} />
           </a>
-          {connected ? (
+          {page.startsWith('visualizer') ? null : connected ? (
             <>
               <button
                 className="connection-status"
@@ -427,7 +435,8 @@ export default function App({ initialPath }: { initialPath?: string } = {}) {
           <Suspense
             fallback={<p className="notice">Opening your workspace…</p>}
           >
-            {page === "home" && <Home start={start} />}{" "}
+            {(page === "home" || page === 'diagrams') && <Home start={start} />}{" "}
+            {page.startsWith('visualizer') && <Visualizer path={page} />}
             {guides.some((g) => g.slug === page) && (
               <Guide
                 slug={page}

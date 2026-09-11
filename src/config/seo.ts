@@ -220,6 +220,11 @@ export const guides = [
 ] as const;
 export function pageMetadata(path: string) {
   const slug = path.replace(/^\/+|\/+$/g, "");
+  if (slug.startsWith('visualizer')) return {
+    title: `${slug === 'visualizer' ? 'AI / ML Visualizer' : slug.split('/')[1].split('-').map(w=>w[0]?.toUpperCase()+w.slice(1)).join(' ')+' — Interactive ML Lab'} — ${BRAND.name}`,
+    description: 'Learn machine learning by changing inputs, weights, gradients and kernels. Interactive neural network, CNN, LSTM and classical ML labs run locally in your browser. No API key.',
+    url: BRAND.url + '/' + slug,
+  };
   const guide = guides.find((g) => g.slug === slug);
   return {
     title: guide

@@ -69,7 +69,7 @@ try {
         operatingSystem: "Any modern web browser",
         description: meta.description,
         browserRequirements:
-          "Requires JavaScript and a user-supplied Gemini API key",
+          route.startsWith('/visualizer') ? 'Requires JavaScript; simulations run locally without an API key' : "Requires JavaScript and a user-supplied Gemini API key for diagram generation",
         featureList: [
           "Architecture diagrams",
           "UML class and sequence diagrams",
@@ -100,7 +100,7 @@ try {
       )
       .replace(
         '<div id="root"></div>',
-        `<div id="root">${renderPage(route)}</div>`,
+        `<div id="root">${await renderPage(route)}</div>`,
       )
       .replaceAll("./assets/", "/assets/")
       .replaceAll("./drawgon-logo.png", "/drawgon-logo.png");

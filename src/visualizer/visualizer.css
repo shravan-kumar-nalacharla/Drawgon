@@ -1,0 +1,420 @@
+.visualizer {
+  --vl-paper: #fffdf8;
+  --vl-ink: #22282d;
+  --vl-line: #d9d7cf;
+  --vl-muted: #656964;
+  background: var(--vl-paper);
+  color: var(--vl-ink);
+  padding: 24px clamp(16px, 4vw, 64px);
+  min-height: 70vh;
+}
+.vl-dark {
+  --vl-paper: #1b1d20;
+  --vl-ink: #efeee8;
+  --vl-line: #4b4e50;
+  --vl-muted: #b8bbb7;
+}
+.visualizer button,
+.visualizer input,
+.visualizer select {
+  color: var(--vl-ink);
+  background: var(--vl-paper);
+  border: 1px solid var(--vl-line);
+  border-radius: 5px;
+  font: inherit;
+  max-width: 100%;
+}
+.visualizer button {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.visualizer button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.visualizer input,
+.visualizer select {
+  padding: 8px;
+}
+.visualizer input[type="range"] {
+  padding: 0;
+  accent-color: #326d96;
+  min-width: 0;
+}
+.visualizer a {
+  color: inherit;
+}
+.visualizer .primary {
+  display: inline-flex;
+  background: #22282d;
+  color: white;
+  padding: 14px 22px;
+  border-radius: 5px;
+}
+.visualizer h1 {
+  font-size: clamp(32px, 4.5vw, 60px);
+  line-height: 1.08;
+  margin: 16px 0;
+}
+.visualizer h2 {
+  font-size: 22px;
+  line-height: 1.3;
+}
+.visualizer p {
+  line-height: 1.65;
+}
+.vl-topbar,
+.vl-toolbar,
+.vl-playback {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--vl-line);
+}
+.vl-topbar > a:first-child {
+  font-weight: 700;
+  margin-right: auto;
+}
+.vl-topbar > span {
+  color: var(--vl-muted);
+  font-size: 13px;
+}
+.vl-hero {
+  max-width: 800px;
+  padding: 65px 0;
+}
+.vl-hero > p {
+  max-width: 590px;
+}
+.vl-hero em {
+  font-family: Georgia, serif;
+  font-weight: 400;
+}
+.vl-paths {
+  padding: 24px 0;
+  border-block: 1px solid var(--vl-line);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.vl-paths > h2 {
+  grid-column: 1/-1;
+}
+.vl-search {
+  display: flex;
+  gap: 20px;
+  margin: 24px 0;
+}
+.vl-search label:first-child {
+  flex: 1;
+}
+.vl-search label,
+.vl-toolbar label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.vl-search input {
+  width: 100%;
+}
+.vl-catalog details {
+  border-bottom: 1px solid var(--vl-line);
+  padding: 20px 0;
+}
+.vl-catalog summary {
+  font-size: 21px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.vl-catalog summary span {
+  font-size: 13px;
+  font-weight: 400;
+  margin-left: 12px;
+  color: var(--vl-muted);
+}
+.vl-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+.vl-cards > a {
+  padding: 22px;
+  border: 1px solid var(--vl-line);
+  border-radius: 6px;
+  text-decoration: none;
+}
+.vl-cards > a:hover {
+  border-color: #326d96;
+  background: #326d960a;
+}
+.vl-cards h3 {
+  margin: 12px 0;
+  font-size: 20px;
+}
+.vl-cards p {
+  font-size: 14px;
+  margin: 0;
+  color: var(--vl-muted);
+}
+.vl-cards small {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.vl-heading {
+  padding: 30px 0 15px;
+}
+.vl-heading h1 {
+  font-size: 42px;
+}
+.vl-lab-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 30px;
+  margin-top: 25px;
+  align-items: start;
+}
+.vl-stage {
+  min-width: 0;
+}
+.vl-inspector {
+  border-left: 1px solid var(--vl-line);
+  padding-left: 24px;
+  min-width: 0;
+}
+.vl-inspector > p {
+  font-size: 13px;
+  color: var(--vl-muted);
+}
+.vl-inspector .vl-matrix > div {
+  min-width: 0;
+}
+.vl-inspector .vl-matrix input {
+  min-width: 0;
+  width: 100%;
+}
+.vl-inspector pre {
+  overflow: auto;
+  max-height: 550px;
+  font-size: 12px;
+}
+.vl-control {
+  display: block;
+  margin: 0 0 16px;
+  font-size: 13px;
+}
+.vl-control > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 7px;
+}
+.vl-control output {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.vl-control > div {
+  display: flex;
+  gap: 8px;
+}
+.vl-control input[type="range"] {
+  flex: 1;
+}
+.vl-control input[type="number"] {
+  width: 78px;
+  padding: 5px;
+}
+.vl-control select {
+  width: 100%;
+}
+.vl-figure {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--vl-line);
+  border-radius: 6px;
+  margin: 0 0 20px;
+  overflow: hidden;
+}
+.vl-figure g[role="button"] {
+  cursor: pointer;
+}
+.vl-formula {
+  border-left: 3px solid #326d96;
+  padding: 14px 18px;
+  margin: 18px 0;
+  background: #326d9609;
+  font-family: Cambria, Georgia, serif;
+  overflow-wrap: anywhere;
+  line-height: 1.8;
+}
+.vl-formula strong,
+.vl-formula output {
+  display: block;
+}
+.vl-formula output {
+  font-weight: 700;
+}
+.vl-matrix {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+  margin: 16px 0;
+  overflow: auto;
+}
+.vl-matrix legend {
+  font-size: 12px;
+  padding: 0 0 8px;
+  color: var(--vl-muted);
+}
+.vl-matrix > div {
+  display: grid;
+  gap: 3px;
+  min-width: max-content;
+}
+.vl-matrix input,
+.vl-matrix button {
+  min-width: 34px;
+  width: 100%;
+  padding: 5px 2px;
+  font-size: 11px;
+  text-align: center;
+  border-radius: 2px;
+}
+.vl-matrix input {
+  max-width: 65px;
+}
+.vl-matrix .active {
+  outline: 2px solid #b84b16;
+  outline-offset: -2px;
+}
+.vl-playback {
+  margin: 20px 0;
+}
+.vl-playback output {
+  font-size: 13px;
+}
+.vl-caption {
+  font-size: 13px;
+  color: var(--vl-muted);
+}
+.vl-related {
+  border-top: 1px solid var(--vl-line);
+  margin-top: 35px;
+  padding: 20px 0;
+}
+.vl-related a {
+  display: inline-block;
+  margin: 0 24px 12px 0;
+}
+.vl-privacy {
+  border-top: 1px solid var(--vl-line);
+  padding-top: 25px;
+  margin-top: 40px;
+  font-size: 12px;
+  color: var(--vl-muted);
+}
+.visualizer :focus-visible {
+  outline: 3px solid #326d96;
+  outline-offset: 3px;
+}
+.vl-models {
+  max-width: 1200px;
+  margin: auto;
+}
+.vl-models > label {
+  display: block;
+  margin: 20px 0;
+}
+.vl-models input[type="file"] {
+  display: block;
+  margin-top: 12px;
+}
+.vl-stage > button {
+  margin-right: 8px;
+}
+.vl-inspector > button {
+  margin: 4px;
+}
+.vl-toolbar {
+  font-size: 13px;
+}
+.vl-toolbar label {
+  white-space: nowrap;
+}
+@media (max-width: 1000px) {
+  .vl-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .vl-lab-grid {
+    grid-template-columns: minmax(0, 1fr) 245px;
+    gap: 20px;
+  }
+  .vl-paths {
+    grid-template-columns: 1fr;
+  }
+  .vl-inspector {
+    padding-left: 15px;
+  }
+}
+@media (max-width: 700px) {
+  .vl-lab-grid {
+    grid-template-columns: 1fr;
+  }
+  .vl-inspector {
+    border-left: 0;
+    border-top: 1px solid var(--vl-line);
+    padding: 20px 0;
+  }
+  .vl-cards {
+    grid-template-columns: 1fr;
+  }
+  .vl-search {
+    flex-direction: column;
+  }
+  .vl-topbar > span {
+    display: none;
+  }
+  .vl-hero {
+    padding: 35px 0;
+  }
+  .vl-heading h1 {
+    font-size: 32px;
+  }
+  .vl-toolbar button {
+    flex: 1;
+  }
+  .vl-playback {
+    gap: 6px;
+  }
+  .vl-playback button {
+    font-size: 12px;
+    padding: 7px;
+  }
+  .vl-figure {
+    min-width: 0;
+  }
+  .vl-matrix > div {
+    min-width: 0;
+  }
+  .vl-stage .vl-matrix {
+    overflow: auto;
+  }
+  .vl-stage .vl-matrix > div {
+    min-width: max-content;
+  }
+  .vl-control input[type="range"] {
+    min-height: 30px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .visualizer * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -60,6 +60,7 @@ export function Home({ start }: { start: () => void }) {
             <button className="primary" onClick={start}>
               Generate Diagrams <ArrowRight size={18} />
             </button>
+            <a className="text-link" href="/visualizer">AI / ML Visualizer <ArrowRight size={18}/></a>
             <a className="text-link" href="#examples">
               View examples <ArrowUpRight size={16} />
             </a>

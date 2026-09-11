@@ -4,6 +4,13 @@ Drawgon (https://drawgon.in) is a browser-only application that turns project de
 
 No account, backend, database or shared API key. The production output is static files.
 
+## Two product areas
+
+- **Project Diagrams** (`/diagrams`): the existing Gemini-powered architecture and UML workflow.
+- **AI / ML Visualizer** (`/visualizer`): interactive mathematical labs for neural networks, classical ML, CNNs, recurrent cells, autoencoders, GANs and transfer learning. Simulations run locally without an API key. The topic catalog and model configuration viewer load separately from the diagram workflow.
+
+The visualizer currently exposes 57 concept routes with SVG/PNG export. Neuron experiments also support validated share links and JSON download. Model inspection accepts bounded Keras JSON configurations only. No TensorFlow.js or external model files are loaded. See [architecture and limits](docs/visualizer-architecture.md), [curriculum coverage](docs/visualizer-topic-coverage.md), and [source notices](OPEN_SOURCE_NOTICES.md). The full requested feature set is still under development; pretrained MNIST inference and several advanced interaction details are not yet included.
+
 ## Run locally
 
 Use Node.js 22.12+ (development verified on Node 24) and npm.
