@@ -6,6 +6,8 @@
 
 ## Implementation
 
+Animation lessons are documented in [visualizer-lessons.md](visualizer-lessons.md). Converted topics expose Learn/Playground/Math; unconverted topics retain their existing labs. The shared network diagram labels input, hidden and output layers and offers animated signal flow with a visual legend.
+
 - `topics/registry.ts` owns category, title, aliases, description, difficulty, family, related-topic IDs and export flags. The landing page progressively reveals categories and supports search.
 - Topic families load using React.lazy. The global home does not load the math engine, model viewer or training worker. Vite emits a separate module-worker asset.
 - `engine/math.ts` contains stable activations, forward/backprop, convolution, pooling, recurrent cells, PCA, clustering helpers and optimizer trajectories.
@@ -23,6 +25,6 @@ The prerenderer waits for React lazy modules and writes HTML for each registered
 
 ## Current limits and unfinished specification details
 
-The implemented labs are intentionally small. CNN inference uses fixed illustrative weights and does not claim to recognize MNIST. A pretrained digit recognizer, RGB channel tensor editor, detailed multi-layer CNN shape inspector, multi-dimensional LSTM gates, drag-to-move points, graph pan/group collapse, and general experiment import/export remain outstanding. Transfer learning uses a locally trained toy backbone, not downloaded pretrained weights. Some topic aliases share a parent lab. Explanation modes currently add guidance rather than providing separately authored content for every topic.
+The implemented labs are intentionally small. CNN inference uses fixed illustrative weights and does not claim to recognize MNIST. A pretrained digit recognizer, RGB channel tensor editor, detailed multi-layer CNN shape inspector, multi-dimensional LSTM gates, drag-to-move points, graph pan/group collapse, and general experiment import/export remain outstanding. Transfer learning uses a locally trained toy backbone, not downloaded pretrained weights. Some topic aliases share a parent lab. Converted topics have authored animation lessons and separate math views; remaining topics retain their Playground experience.
 
 The model viewer does not support ONNX, TFLite, binary Keras or PyTorch exports. The UI states these limits. This document does not mark the full requested product specification complete.

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { convolutionLesson } from "../lesson/Convolution";
 import {
   convolve,
   pool,
@@ -157,6 +158,9 @@ export default function Convolution({ topic }: { topic: string }) {
     probs = softmax(logits);
   return (
     <LabLayout
+      lesson={
+        pooling ? undefined : convolutionLesson(input, kernel, stride, padding)
+      }
       controls={
         <>
           <h2>

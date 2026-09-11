@@ -443,3 +443,22 @@ export const topics: Topic[] = groups.flatMap(([category, family, items]) =>
   })),
 );
 export const categories = [...new Set(topics.map((t) => t.category))];
+export const lessonTopics = new Set([
+  "neuron",
+  "forward",
+  "backprop",
+  "gradient-descent",
+  "optimizers",
+  "convolution",
+  "filters",
+  "stride",
+  "padding",
+  "image-tensor",
+  "cnn",
+  "feature-maps",
+  "cnn-vs-dense",
+  "lstm",
+  "rnn",
+  "gru",
+  "bptt",
+]);

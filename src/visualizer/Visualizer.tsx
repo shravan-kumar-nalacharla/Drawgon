@@ -1,5 +1,10 @@
 import { lazy, Suspense, useRef, useState } from "react";
-import { categories, topics, type Family } from "./topics/registry";
+import {
+  categories,
+  topics,
+  lessonTopics,
+  type Family,
+} from "./topics/registry";
 import "./visualizer.css";
 const modules: Record<Family, ReturnType<typeof lazy>> = {
   Foundations: lazy(() => import("./topics/Foundations")),
@@ -20,8 +25,7 @@ export default function Visualizer({ path }: { path: string }) {
     [scale, setScale] = useState("2"),
     [background, setBackground] = useState("Current theme"),
     [extent, setExtent] = useState("Full visualization"),
-    [error, setError] = useState(""),
-    [level, setLevel] = useState("Intuition");
+    [error, setError] = useState("");
   const content = useRef<HTMLDivElement>(null),
     Module = topic ? modules[topic.family] : null;
   async function download(format: "svg" | "png") {
@@ -190,6 +194,11 @@ export default function Visualizer({ path }: { path: string }) {
                           <small>{t.difficulty}</small>
                           <h3>{t.title} ↗</h3>
                           <p>{t.description}</p>
+                          {lessonTopics.has(t.id) && (
+                            <small>
+                              ▶ Animated lesson · Learn, play, explore the math
+                            </small>
+                          )}
                         </a>
                       ))}
                     </div>
@@ -221,17 +230,6 @@ export default function Visualizer({ path }: { path: string }) {
           {(topic || id === "models") && (
             <>
               <div className="vl-toolbar">
-                <label>
-                  Explanation
-                  <select
-                    value={level}
-                    onChange={(e) => setLevel(e.target.value)}
-                  >
-                    {["Intuition", "Math", "Technical"].map((v) => (
-                      <option key={v}>{v}</option>
-                    ))}
-                  </select>
-                </label>
                 <label>
                   Export view
                   <select
@@ -279,20 +277,6 @@ export default function Visualizer({ path }: { path: string }) {
                   </>
                 )}
               </div>
-              {level === "Technical" && (
-                <p className="vl-caption">
-                  Browser-only TypeScript calculations. Small models and bounded
-                  data keep experiments inspectable. Training loss, gradients
-                  and displayed values are calculated from the active
-                  parameters.
-                </p>
-              )}
-              {level === "Math" && (
-                <p className="vl-caption">
-                  The live formula panels show the operation, substituted values
-                  and result. Change a parameter to recompute.
-                </p>
-              )}
               {error && <p role="alert">{error}</p>}
               <div ref={content}>
                 <Suspense

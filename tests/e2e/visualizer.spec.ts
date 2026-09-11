@@ -1,6 +1,29 @@
 import { test, expect } from "@playwright/test";
 import { topics } from "../../src/visualizer/topics/registry";
-test('dark lab exports readable white SVG and integer dimensions stay valid',async({page})=>{await page.goto('/visualizer/convolution');await page.getByRole('button',{name:'Dark theme'}).click();await page.getByLabel('Background',{exact:true}).selectOption('White');await page.getByRole('spinbutton',{name:'Stride value',exact:true}).fill('1.5');await expect(page.getByRole('spinbutton',{name:'Stride value',exact:true})).toHaveValue('2');const event=page.waitForEvent('download');await page.getByRole('button',{name:'Download SVG',exact:true}).click();const file=await event,stream=await file.createReadStream(),chunks:Buffer[]=[];for await(const chunk of stream!)chunks.push(chunk);const svg=Buffer.concat(chunks).toString();expect(svg).toContain('fill="white"');expect(svg).toContain('#22282d');expect(svg).not.toContain('fill="rgb(239, 238, 232)"');});
+test("dark lab exports readable white SVG and integer dimensions stay valid", async ({
+  page,
+}) => {
+  await page.goto("/visualizer/convolution");
+  await page.getByRole("tab", { name: "Playground", exact: true }).click();
+  await page.getByRole("button", { name: "Dark theme" }).click();
+  await page.getByLabel("Background", { exact: true }).selectOption("White");
+  await page
+    .getByRole("spinbutton", { name: "Stride value", exact: true })
+    .fill("1.5");
+  await expect(
+    page.getByRole("spinbutton", { name: "Stride value", exact: true }),
+  ).toHaveValue("2");
+  const event = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download SVG", exact: true }).click();
+  const file = await event,
+    stream = await file.createReadStream(),
+    chunks: Buffer[] = [];
+  for await (const chunk of stream!) chunks.push(chunk);
+  const svg = Buffer.concat(chunks).toString();
+  expect(svg).toContain('fill="white"');
+  expect(svg).toContain("#22282d");
+  expect(svg).not.toContain('fill="rgb(239, 238, 232)"');
+});
 test("production visualizer is prerendered and does not load analytics", async ({
   page,
 }) => {
@@ -32,6 +55,7 @@ test("shared neuron state restores and model configurations stay local", async (
     "/visualizer/neuron#" +
       new URLSearchParams({ experiment: JSON.stringify(state) }),
   );
+  await page.getByRole("tab", { name: "Playground", exact: true }).click();
   await expect(page.locator(".vl-formula output")).toHaveText("Output = 2");
   await page.goto("/visualizer/models");
   await page.locator("input[type=file]").setInputFiles({
@@ -88,6 +112,7 @@ test("neuron controls change output and SVG/PNG downloads contain data", async (
   page,
 }) => {
   await page.goto("/visualizer/neuron");
+  await page.getByRole("tab", { name: "Playground", exact: true }).click();
   const output = page.locator(".vl-formula output"),
     before = await output.textContent();
   await page
@@ -119,6 +144,7 @@ test("convolution, backprop, clustering and LSTM steps update real state", async
   page,
 }) => {
   await page.goto("/visualizer/convolution");
+  await page.getByRole("tab", { name: "Playground", exact: true }).click();
   const before = await page.locator(".vl-formula output").first().textContent();
   await page
     .getByRole("spinbutton", { name: "Kernel row 1 column 3", exact: true })
@@ -131,6 +157,7 @@ test("convolution, backprop, clustering and LSTM steps update real state", async
     .fill("2");
   await expect(page.locator(".vl-formula output").last()).toContainText("= 2");
   await page.goto("/visualizer/backprop");
+  await page.getByRole("tab", { name: "Playground", exact: true }).click();
   await page.getByRole("button", { name: "Next", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Hidden weighted sums and activations" }),
@@ -141,6 +168,7 @@ test("convolution, backprop, clustering and LSTM steps update real state", async
     "Next: move centers",
   );
   await page.goto("/visualizer/lstm");
+  await page.getByRole("tab", { name: "Playground", exact: true }).click();
   await page.getByRole("button", { name: "Next timestep" }).click();
   await expect(page.getByText("Step 1 / 4", { exact: true })).toBeVisible();
 });
@@ -160,6 +188,7 @@ for (const width of [1440, 820, 390])
   test(`fundamental labs fit ${width}px viewport`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/visualizer/lstm");
+    await page.getByRole("tab", { name: "Playground", exact: true }).click();
     await expect(page.locator("svg[data-export]").first()).toBeVisible();
     expect(
       await page.evaluate(

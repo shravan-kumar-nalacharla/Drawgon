@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { memoryLesson } from "../lesson/Memory";
+import { recurrentLesson } from "../lesson/Recurrent";
 import { defaultGates, gru, lstm, rnn, type GateWeights } from "../engine/math";
 import {
   Control,
@@ -45,6 +47,17 @@ export default function Sequence({ topic }: { topic: string }) {
   }
   return (
     <LabLayout
+      lesson={
+        topic === "lstm"
+          ? memoryLesson(ls, manual)
+          : ["rnn", "gru", "bptt"].includes(topic)
+            ? recurrentLesson(
+                topic === "gru" ? gs : rs,
+                topic === "gru",
+                topic === "bptt" ? gradients : undefined,
+              )
+            : undefined
+      }
       controls={
         <>
           <Matrix name="Input sequence" values={xs} onChange={setXs} />

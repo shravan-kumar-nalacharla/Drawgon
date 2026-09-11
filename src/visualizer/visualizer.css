@@ -418,3 +418,117 @@
     scroll-behavior: auto !important;
   }
 }
+.visualizer {
+  --vl-active: #24648b;
+}
+.visualizer.vl-dark {
+  --vl-active: #8ac9ec;
+}
+.vl-modes,
+.vl-lesson-controls,
+.vl-legend,
+.vl-scene-ticks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.vl-modes {
+  border-bottom: 1px solid var(--vl-line);
+  padding: 12px 0;
+  margin-bottom: 20px;
+}
+.vl-modes button[aria-selected="true"] {
+  background: var(--vl-ink);
+  color: var(--vl-paper);
+}
+.vl-intro {
+  font-size: 1.3rem;
+  max-width: 850px;
+}
+.vl-lesson-stage {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--vl-line);
+  border-radius: 12px;
+  margin-top: 24px;
+}
+.vl-lesson-stage .vl-figure {
+  display: block;
+  border: 0;
+  margin: 0;
+  max-height: 560px;
+}
+.vl-lesson-progress {
+  width: 100%;
+  accent-color: var(--vl-active);
+  margin: 20px 0 10px;
+}
+.vl-scene-explanation {
+  padding: 20px 0;
+  min-height: 145px;
+}
+.vl-scene-explanation h2 {
+  margin: 8px 0;
+}
+.vl-scene-explanation p {
+  max-width: 850px;
+}
+.vl-scene-ticks {
+  gap: 5px;
+}
+.vl-scene-ticks button {
+  font-size: 12px;
+  padding: 5px 10px;
+}
+.vl-scene-ticks button[aria-current] {
+  outline: 2px solid var(--vl-active);
+}
+.vl-legend {
+  font-size: 12px;
+  padding: 14px 0;
+  gap: 16px;
+}
+.vl-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.vl-sample {
+  display: inline-block;
+  width: 28px;
+  border-top: 2px solid var(--vl-ink);
+}
+.vl-negative {
+  border-top-style: dashed;
+}
+.vl-current {
+  border-color: var(--vl-active);
+  border-top-width: 3px;
+}
+.vl-player:focus-visible {
+  outline: 2px solid var(--vl-active);
+  outline-offset: 5px;
+}
+.vl-completed {
+  padding: 22px 0;
+}
+.vl-completed button {
+  margin-right: 12px;
+}
+.vl-math {
+  max-width: 1000px;
+}
+.vl-mobile-zoom { display: none; }
+@media (max-width: 600px) {
+  .vl-mobile-zoom { display: inline-block; }
+  .vl-lesson-stage.vl-enlarged .vl-figure {
+    min-width: 620px;
+  }
+  .vl-lesson-controls button {
+    flex: 1 1 28%;
+  }
+  .vl-legend {
+    gap: 10px;
+  }
+}

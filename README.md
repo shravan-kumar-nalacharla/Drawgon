@@ -6,6 +6,8 @@ No account, backend, database or shared API key. The production output is static
 
 ## Two product areas
 
+Animation-first lessons now introduce neurons, forward propagation, backpropagation, gradient descent, convolution and recurrent memory through **Learn → Playground → Math**. They reuse the live calculation engines and preserve Playground parameters between modes. See [lesson architecture and authoring](docs/visualizer-lessons.md).
+
 - **Project Diagrams** (`/diagrams`): the existing Gemini-powered architecture and UML workflow.
 - **AI / ML Visualizer** (`/visualizer`): interactive mathematical labs for neural networks, classical ML, CNNs, recurrent cells, autoencoders, GANs and transfer learning. Simulations run locally without an API key. The topic catalog and model configuration viewer load separately from the diagram workflow.
 

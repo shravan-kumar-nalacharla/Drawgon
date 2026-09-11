@@ -1,5 +1,9 @@
 import { useEffect, useState, type ReactNode } from "react";
 import type { Matrix as Mat, Network, Point } from "../engine/math";
+import { LessonShell } from "../lesson/LessonPlayer";
+import type { Lesson } from "../lesson/timeline";
+import { useLessonPlayer } from "../lesson/useLessonPlayer";
+import { Signal, Legend } from "../lesson/primitives";
 export const fmt = (n: number) =>
   Number.isFinite(n)
     ? Math.abs(n) > 1e5 || (Math.abs(n) < 0.0001 && n !== 0)
@@ -68,7 +72,11 @@ export function Select({
   return (
     <label className="vl-control">
       <span>{label}</span>
-      <select aria-label={label} value={value} onChange={(e) => onChange(e.target.value)}>
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
         {options.map((o) => (
           <option key={o}>{o}</option>
         ))}
@@ -267,13 +275,23 @@ export function NetworkView({
   gradients,
   onSelect,
   selected,
+  animateChanges = false,
 }: {
   net: Network;
   values: number[][];
   gradients?: number[][][];
   onSelect?: (l: number, j: number, i: number) => void;
   selected?: number[];
+  animateChanges?: boolean;
 }) {
+  const flow = useLessonPlayer(
+    net.w.map((_, l) => ({
+      title: `Layer ${l + 1}`,
+      explanation: "",
+      duration: 2000,
+    })),
+    animateChanges ? JSON.stringify([net, values]) : undefined,
+  );
   const height = Math.max(
     360,
     Math.max(...values.map((v) => v.length)) * 65 + 100,
@@ -282,77 +300,110 @@ export function NetworkView({
     ys = (l: number, i: number) =>
       90 + (i * (height - 150)) / Math.max(1, values[l].length - 1);
   return (
-    <Figure title="Weighted neural network" height={height}>
-      <g>
-        {net.w.flatMap((layer, l) =>
-          layer.flatMap((row, j) =>
-            row.map((w, i) => (
-              <g
-                key={`${l}-${j}-${i}`}
-                tabIndex={0}
-                role="button"
-                aria-label={`Weight ${l + 1}.${j + 1}.${i + 1}: ${fmt(w)}`}
-                onClick={() => onSelect?.(l, j, i)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") onSelect?.(l, j, i);
-                }}
+    <div>
+      <button onClick={flow.toggle}>
+        {flow.playing ? "Pause signal flow" : "Animate signal flow"}
+      </button>
+      <Figure title="Weighted neural network" height={height}>
+        {xs.map((x, l) => (
+          <text
+            key={l}
+            x={x}
+            y="55"
+            textAnchor="middle"
+            fill="currentColor"
+            fontWeight="bold"
+          >
+            {l === 0
+              ? "Input layer"
+              : l === xs.length - 1
+                ? "Output layer"
+                : `Hidden layer ${l}`}
+          </text>
+        ))}
+        <g>
+          {net.w.flatMap((layer, l) =>
+            layer.flatMap((row, j) =>
+              row.map((w, i) => (
+                <g
+                  key={`${l}-${j}-${i}`}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Weight ${l + 1}.${j + 1}.${i + 1}: ${fmt(w)}`}
+                  onClick={() => onSelect?.(l, j, i)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") onSelect?.(l, j, i);
+                  }}
+                >
+                  <title>{`Weight ${fmt(w)}${gradients ? `; gradient ${fmt(gradients[l][j][i])}` : ""}`}</title>
+                  <line
+                    x1={xs[l]}
+                    y1={ys(l, i)}
+                    x2={xs[l + 1]}
+                    y2={ys(l + 1, j)}
+                    stroke={
+                      selected?.join() === [l, j, i].join()
+                        ? "var(--vl-active)"
+                        : "currentColor"
+                    }
+                    strokeWidth={Math.min(6, 1 + Math.abs(w))}
+                    strokeDasharray={w < 0 ? "5 4" : undefined}
+                  />
+                  {flow.elapsed > 0 &&
+                    flow.elapsed < flow.total &&
+                    flow.index === l &&
+                    i < 8 &&
+                    j < 8 && (
+                      <Signal
+                        from={[xs[l], ys(l, i)]}
+                        to={[xs[l + 1], ys(l + 1, j)]}
+                        progress={flow.visualProgress}
+                        value={values[l][i]}
+                      />
+                    )}
+                  {values.flat().length < 8 && (
+                    <text
+                      x={(xs[l] + xs[l + 1]) / 2}
+                      y={(ys(l, i) + ys(l + 1, j)) / 2 - 6}
+                      fill="currentColor"
+                    >
+                      {fmt(w)}
+                    </text>
+                  )}
+                </g>
+              )),
+            ),
+          )}
+        </g>
+        {values.flatMap((row, l) =>
+          row.map((v, i) => (
+            <g key={`${l}-${i}`}>
+              <circle
+                cx={xs[l]}
+                cy={ys(l, i)}
+                r="25"
+                fill="var(--vl-paper)"
+                stroke="currentColor"
+                strokeWidth="2"
+              />
+              <text
+                x={xs[l]}
+                y={ys(l, i) + 4}
+                textAnchor="middle"
+                fill="currentColor"
               >
-                <title>{`Weight ${fmt(w)}${gradients ? `; gradient ${fmt(gradients[l][j][i])}` : ""}`}</title>
-                <line
-                  x1={xs[l]}
-                  y1={ys(l, i)}
-                  x2={xs[l + 1]}
-                  y2={ys(l + 1, j)}
-                  stroke={
-                    selected?.join() === [l, j, i].join()
-                      ? "#b84b16"
-                      : "currentColor"
-                  }
-                  strokeWidth={Math.min(6, 1 + Math.abs(w))}
-                  strokeDasharray={w < 0 ? "5 4" : undefined}
-                />
-                {values.flat().length < 8 && (
-                  <text
-                    x={(xs[l] + xs[l + 1]) / 2}
-                    y={(ys(l, i) + ys(l + 1, j)) / 2 - 6}
-                    fill="currentColor"
-                  >
-                    {fmt(w)}
-                  </text>
-                )}
-              </g>
-            )),
-          ),
+                {fmt(v)}
+              </text>
+              <title>{`Layer ${l}, neuron ${i + 1}; activation ${v}; bias ${net.b[l - 1]?.[i] ?? 0}`}</title>
+            </g>
+          )),
         )}
-      </g>
-      {values.flatMap((row, l) =>
-        row.map((v, i) => (
-          <g key={`${l}-${i}`}>
-            <circle
-              cx={xs[l]}
-              cy={ys(l, i)}
-              r="25"
-              fill="var(--vl-paper)"
-              stroke="currentColor"
-              strokeWidth="2"
-            />
-            <text
-              x={xs[l]}
-              y={ys(l, i) + 4}
-              textAnchor="middle"
-              fill="currentColor"
-            >
-              {fmt(v)}
-            </text>
-            <title>{`Layer ${l}, neuron ${i + 1}; activation ${v}; bias ${net.b[l - 1]?.[i] ?? 0}`}</title>
-          </g>
-        )),
-      )}
-      <text x="24" y={height - 15} fill="currentColor">
-        Solid: positive · Dashed: negative · Width: |weight| · Select an edge to
-        inspect
-      </text>
-    </Figure>
+        <text x="24" y={height - 15} fill="currentColor">
+          Line width = weight strength · Select an edge to inspect
+        </text>
+      </Figure>
+      <Legend />
+    </div>
   );
 }
 export function Plot({
@@ -455,11 +506,23 @@ export function LabLayout({
   children,
   controls,
   experiment,
+  lesson,
 }: {
   children: ReactNode;
   controls: ReactNode;
   experiment?: unknown;
+  lesson?: Lesson;
 }) {
+  if (lesson)
+    return (
+      <div
+        data-experiment={experiment ? JSON.stringify(experiment) : undefined}
+      >
+        <LessonShell lesson={lesson}>
+          <LabLayout controls={controls}>{children}</LabLayout>
+        </LessonShell>
+      </div>
+    );
   return (
     <div
       className="vl-lab-grid"

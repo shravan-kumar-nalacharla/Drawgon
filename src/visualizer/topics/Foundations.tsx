@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { neuronLesson } from "../lesson/Neuron";
+import { networkLesson } from "../lesson/Network";
+import { descentLesson } from "../lesson/Descent";
 import { readNeuron } from "../state/experiment";
 import { scalarLoss } from "../engine/preprocessing";
 import Preprocessing from "./Preprocessing";
@@ -38,7 +41,7 @@ export default function Foundations({ topic }: { topic: string }) {
   if (["gradient-descent", "optimizers"].includes(topic)) return <Descent />;
   if (["gradient-flow", "initialization"].includes(topic))
     return <GradientFlow />;
-  return <Backprop />;
+  return <Backprop forwardOnly={topic === "forward"} />;
 }
 function Neuron() {
   const [saved] = useState(readNeuron);
@@ -52,6 +55,7 @@ function Neuron() {
   return (
     <LabLayout
       experiment={{ version: 1, topic: "neuron", x, w, b, act, step }}
+      lesson={neuronLesson(x, w, b, act)}
       controls={
         <>
           <h2>Give each input an importance</h2>
@@ -86,6 +90,7 @@ function Neuron() {
       }
     >
       <NetworkView
+        animateChanges
         net={{ w: [[w]], b: [[b]], act }}
         values={[x, [n.a]]}
         onSelect={(...v) => select(v)}
@@ -183,7 +188,7 @@ function Activations() {
     </LabLayout>
   );
 }
-function Backprop() {
+function Backprop({ forwardOnly = false }: { forwardOnly?: boolean }) {
   const [net, setNet] = useState(() => network([2, 2, 1])),
     [x, setX] = useState([[0.7, 0.3]]),
     [target, setTarget] = useState(1),
@@ -205,6 +210,7 @@ function Backprop() {
   ];
   return (
     <LabLayout
+      lesson={networkLesson(net, x[0], target, lr, forwardOnly)}
       controls={
         <>
           <h2>Inspect a connection</h2>
@@ -434,6 +440,7 @@ function Descent() {
     now = history.at(-1)!;
   return (
     <LabLayout
+      lesson={descentLesson(kind, start, lr, landscape, decay)}
       controls={
         <>
           <Select
